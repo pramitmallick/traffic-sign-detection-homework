@@ -1,4 +1,5 @@
 #!/bin/bash
+rm out.*
 #SBATCH --verbose
 #SBATCH --job-name=CVAss2
 #SBATCH --time=100:00:00

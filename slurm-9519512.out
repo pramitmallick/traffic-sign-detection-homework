@@ -1,0 +1,35 @@
+rm: cannot remove ‘out.*’: No such file or directory
+/share/apps/pytorch/0.3.0_4/python2.7/lib/python2.7/site-packages/torchvision/transforms/transforms.py:156: UserWarning: The use of the transforms.Scale transform is deprecated, please use transforms.Resize instead.
+  "please use transforms.Resize instead.")
+/home/pm2758/CV/traffic-sign-detection-homework/model.py:23: UserWarning: Implicit dimension choice for log_softmax has been deprecated. Change the call to include dim=X as an argument.
+  return F.log_softmax(x)
+Train Epoch: 1 [0/18618 (0%)]	Loss: 3.809016
+Train Epoch: 1 [640/18618 (3%)]	Loss: 3.780341
+Train Epoch: 1 [1280/18618 (7%)]	Loss: 3.743968
+Train Epoch: 1 [1920/18618 (10%)]	Loss: 3.685217
+Traceback (most recent call last):
+  File "main.py", line 82, in <module>
+    train(epoch)
+  File "main.py", line 52, in train
+    for batch_idx, (data, target) in enumerate(train_loader):
+  File "/share/apps/pytorch/0.3.0_4/python2.7/lib/python2.7/site-packages/torch/utils/data/dataloader.py", line 210, in __next__
+    return self._process_next_batch(batch)
+  File "/share/apps/pytorch/0.3.0_4/python2.7/lib/python2.7/site-packages/torch/utils/data/dataloader.py", line 230, in _process_next_batch
+    raise batch.exc_type(batch.exc_msg)
+IOError: Traceback (most recent call last):
+  File "/share/apps/pytorch/0.3.0_4/python2.7/lib/python2.7/site-packages/torch/utils/data/dataloader.py", line 42, in _worker_loop
+    samples = collate_fn([dataset[i] for i in batch_indices])
+  File "/share/apps/pytorch/0.3.0_4/python2.7/lib/python2.7/site-packages/torchvision/datasets/folder.py", line 122, in __getitem__
+    img = self.loader(path)
+  File "/share/apps/pytorch/0.3.0_4/python2.7/lib/python2.7/site-packages/torchvision/datasets/folder.py", line 69, in default_loader
+    return pil_loader(path)
+  File "/share/apps/pytorch/0.3.0_4/python2.7/lib/python2.7/site-packages/torchvision/datasets/folder.py", line 51, in pil_loader
+    with Image.open(f) as img:
+  File "/share/apps/pytorch/0.3.0_4/python2.7/lib/python2.7/site-packages/PIL/Image.py", line 2572, in open
+    % (filename if filename else fp))
+IOError: cannot identify image file <open file 'data/train_images/00004/00044_00024.ppm', mode 'rb' at 0x2af41cf27810>
+
+/share/apps/pytorch/0.3.0_4/python2.7/lib/python2.7/site-packages/torchvision/transforms/transforms.py:156: UserWarning: The use of the transforms.Scale transform is deprecated, please use transforms.Resize instead.
+  "please use transforms.Resize instead.")
+usage: evaluate.py [-h] [--data D] [--model M] [--outfile D]
+evaluate.py: error: unrecognized arguments: model_latest.pth
