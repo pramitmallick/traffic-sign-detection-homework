@@ -81,6 +81,7 @@ def validation():
 for epoch in range(1, args.epochs + 1):
     train(epoch)
     validation()
-    model_file = 'model_' + str(epoch) + '.pth'
+    # model_file = 'model_' + str(epoch) + '.pth'
+    model_file = 'model_latest.pth'
     torch.save(model.state_dict(), model_file)
     print('\nSaved model to ' + model_file + '. You can run `python evaluate.py ' + model_file + '` to generate the Kaggle formatted csv file')
