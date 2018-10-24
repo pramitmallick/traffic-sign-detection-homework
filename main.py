@@ -50,8 +50,8 @@ def make_weights_for_balanced_classes(images, nclasses):
 from data import initialize_data, data_transforms # data.py in the same folder
 initialize_data(args.data) # extracts the zip files, makes a validation set
 
-dataset_train = datasets.ImageFolder(args.data + '/train_images',
-                         transform=data_transforms)                                                                         
+# dataset_train = datasets.ImageFolder(args.data + '/train_images',
+#                          transform=data_transforms)                                                                         
                                                                                 
 # # For unbalanced dataset we create a weighted sampler                       
 # weights = make_weights_for_balanced_classes(dataset_train.imgs, len(dataset_train.classes))                                                                
@@ -148,11 +148,13 @@ best_val_acc = 0
 for epoch in range(1, args.epochs + 1):
     [train_loss, train_acc] = train(epoch, convergencePlots)
     [val_loss, val_acc] = validation(convergencePlots)
+    model_file = '/scratch/pm2758/cv_ass2/model_' + str(epoch) + '.pth'
+    torch.save(model.state_dict(), model_file)
+    # /scratch/pm2758/cv_ass2
     if val_acc > best_val_acc:
         best_val_acc = val_acc
-    # model_file = 'model_' + str(epoch) + '.pth'
         model_file = 'model_stn.pth'
         torch.save(model.state_dict(), model_file)
         print('\nSaved model to ' + model_file + '. You can run `python evaluate.py ' + model_file + '` to generate the Kaggle formatted csv file')
         convergencePlots['best_val_acc'] = [epoch, best_val_acc]
-        pickle.dump( convergencePlots, open( "convergencePlots_model_stn.p", "wb" ) )
+    pickle.dump( convergencePlots, open( "convergencePlots_model_stn.p", "wb" ) )
