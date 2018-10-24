@@ -29,6 +29,10 @@ args = parser.parse_args()
 
 torch.manual_seed(args.seed)
 
+cuda_available = False
+if torch.cuda.is_available():
+    cuda_available = True
+
 ### Data Initialization and Loading
 from data import initialize_data, data_transforms # data.py in the same folder
 initialize_data(args.data) # extracts the zip files, makes a validation set
@@ -46,6 +50,8 @@ val_loader = torch.utils.data.DataLoader(
 # We define neural net in model.py so that it can be reused by the evaluate.py script
 from model import Net
 model = Net()
+if cuda_available:
+    model.cuda()
 
 # optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
@@ -58,6 +64,9 @@ def train(epoch, convergencePlots):
     train_loss = 0
     for batch_idx, (data, target) in enumerate(train_loader):
         numBatches += 1
+        if cuda_available:
+            data = data.cuda()
+            target = target.cuda()
         data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
         # print("data", data.size())
@@ -87,6 +96,9 @@ def validation(convergencePlots):
     validation_loss = 0
     correct = 0
     for data, target in val_loader:
+        if cuda_available:
+            data = data.cuda()
+            target = target.cuda()
         data, target = Variable(data, volatile=True), Variable(target)
         output = model(data)
         validation_loss += F.cross_entropy(output, target, size_average=False).data[0] # sum up batch loss
