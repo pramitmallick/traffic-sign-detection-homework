@@ -173,8 +173,8 @@ for epoch in range(1, args.epochs + 1):
     # /scratch/pm2758/cv_ass2
     if val_acc > best_val_acc:
         best_val_acc = val_acc
-        model_file = 'model_stn_lr2.pth'
+        model_file = 'model_stn_lr2_conv.pth'
         torch.save(model.state_dict(), model_file)
         print('\nSaved model to ' + model_file + '. You can run `python evaluate.py ' + model_file + '` to generate the Kaggle formatted csv file')
         convergencePlots['best_val_acc'] = [epoch, best_val_acc]
-    pickle.dump( convergencePlots, open( "convergencePlots_model_stn_lr2.p", "wb" ) )
+    pickle.dump( convergencePlots, open( "convergencePlots_model_stn_lr2_conv.p", "wb" ) )
