@@ -13,4 +13,4 @@ module load python/intel/2.7.12 pytorch/0.2.0_1 protobuf/intel/3.1.0 spyder/3.1.
 module load torchvision/0.1.8
 
 python main.py
-python evaluate.py --model model_latest_Adagrad_dataAugmentation_lr.pth --outfile out_latest_Adagrad_dataAugmentation_lr.csv
+python evaluate.py --model model_stn.pth --outfile out_stn.txt

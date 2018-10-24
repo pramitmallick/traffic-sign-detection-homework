@@ -53,27 +53,27 @@ initialize_data(args.data) # extracts the zip files, makes a validation set
 dataset_train = datasets.ImageFolder(args.data + '/train_images',
                          transform=data_transforms)                                                                         
                                                                                 
-# For unbalanced dataset we create a weighted sampler                       
-weights = make_weights_for_balanced_classes(dataset_train.imgs, len(dataset_train.classes))                                                                
-weights = torch.DoubleTensor(weights)                                       
-sampler = torch.utils.data.sampler.WeightedRandomSampler(weights, len(weights))                     
+# # For unbalanced dataset we create a weighted sampler                       
+# weights = make_weights_for_balanced_classes(dataset_train.imgs, len(dataset_train.classes))                                                                
+# weights = torch.DoubleTensor(weights)                                       
+# sampler = torch.utils.data.sampler.WeightedRandomSampler(weights, len(weights))                     
                                                                                 
-train_loader = torch.utils.data.DataLoader(dataset_train, batch_size=args.batch_size, shuffle = False,                              
-                                                             sampler = sampler, num_workers=1)
+# train_loader = torch.utils.data.DataLoader(dataset_train, batch_size=args.batch_size, shuffle = False,                              
+#                                                              sampler = sampler, num_workers=1)
 
-val_loader = torch.utils.data.DataLoader(
-    datasets.ImageFolder(args.data + '/val_images',
-                         transform=data_transforms),
-    batch_size=args.batch_size, shuffle=False, num_workers=1)
-
-# train_loader = torch.utils.data.DataLoader(
-#     datasets.ImageFolder(args.data + '/train_images',
-#                          transform=data_transforms),
-#     batch_size=args.batch_size, shuffle=True, num_workers=1)
 # val_loader = torch.utils.data.DataLoader(
 #     datasets.ImageFolder(args.data + '/val_images',
 #                          transform=data_transforms),
 #     batch_size=args.batch_size, shuffle=False, num_workers=1)
+
+train_loader = torch.utils.data.DataLoader(
+    datasets.ImageFolder(args.data + '/train_images',
+                         transform=data_transforms),
+    batch_size=args.batch_size, shuffle=True, num_workers=1)
+val_loader = torch.utils.data.DataLoader(
+    datasets.ImageFolder(args.data + '/val_images',
+                         transform=data_transforms),
+    batch_size=args.batch_size, shuffle=False, num_workers=1)
 
 ### Neural Network and Optimizer
 # We define neural net in model.py so that it can be reused by the evaluate.py script
@@ -82,8 +82,8 @@ model = Net()
 if cuda_available:
     model.cuda()
 
-# optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
+optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+# optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
 
 def train(epoch, convergencePlots):
     model.train()
@@ -119,6 +119,7 @@ def train(epoch, convergencePlots):
     train_loss /= len(train_loader.dataset)
     convergencePlots['training_avg_loss'].append(train_loss)
     convergencePlots['training_avg_acc'].append(100. * correct / len(train_loader.dataset))
+    return [train_loss, 100. * correct / len(train_loader.dataset)]
 
 def validation(convergencePlots):
     model.eval()
@@ -140,13 +141,18 @@ def validation(convergencePlots):
         100. * correct / len(val_loader.dataset)))
     convergencePlots['validation_avg_loss'].append(validation_loss)
     convergencePlots['validation_avg_acc'].append(100. * correct / len(val_loader.dataset))
+    return [validation_loss, 100. * correct / len(val_loader.dataset)]
 
 convergencePlots = collections.defaultdict(list)
+best_val_acc = 0
 for epoch in range(1, args.epochs + 1):
-    train(epoch, convergencePlots)
-    validation(convergencePlots)
+    [train_loss, train_acc] = train(epoch, convergencePlots)
+    [val_loss, val_acc] = validation(convergencePlots)
+    if val_acc > best_val_acc:
+        best_val_acc = val_acc
     # model_file = 'model_' + str(epoch) + '.pth'
-    model_file = 'model_latest_Adagrad_dataAugmentation_lr.pth'
-    torch.save(model.state_dict(), model_file)
-    print('\nSaved model to ' + model_file + '. You can run `python evaluate.py ' + model_file + '` to generate the Kaggle formatted csv file')
-    pickle.dump( convergencePlots, open( "convergencePlots_Adagrad_dataAugmentation_lr.p", "wb" ) )
+        model_file = 'model_stn.pth'
+        torch.save(model.state_dict(), model_file)
+        print('\nSaved model to ' + model_file + '. You can run `python evaluate.py ' + model_file + '` to generate the Kaggle formatted csv file')
+        convergencePlots['best_val_acc'] = [epoch, best_val_acc]
+        pickle.dump( convergencePlots, open( "convergencePlots_model_stn.p", "wb" ) )
