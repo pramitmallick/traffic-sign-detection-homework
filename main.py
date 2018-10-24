@@ -82,10 +82,7 @@ model = Net()
 if cuda_available:
     model.cuda()
 
-optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-# optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
-
-def train(epoch, convergencePlots):
+def train(epoch, convergencePlots, optimizer):
     model.train()
     sumLoss = 0
     numBatches = 0
@@ -145,16 +142,33 @@ def validation(convergencePlots):
 
 convergencePlots = collections.defaultdict(list)
 best_val_acc = 0
+
+lr = args.lr
+optimizer = optim.SGD(model.parameters(), lr=lr, momentum=args.momentum)
+# optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
+val80 = False
+val90 = False
+
 for epoch in range(1, args.epochs + 1):
-    [train_loss, train_acc] = train(epoch, convergencePlots)
+    [train_loss, train_acc] = train(epoch, convergencePlots, optimizer)
     [val_loss, val_acc] = validation(convergencePlots)
-    model_file = '/scratch/pm2758/cv_ass2/model_' + str(epoch) + '.pth'
+    model_file = '/scratch/pm2758/cv_ass2/lr_model_' + str(epoch) + '.pth'
     torch.save(model.state_dict(), model_file)
+    convergencePlots['lr'].append(lr)
+    if val_acc > 80 and not val80:
+        lr /= 2
+        optimizer = optim.SGD(model.parameters(), lr=lr, momentum=args.momentum)
+        val80 = True
+    if val_acc > 90 and not val90:
+        lr /= 2
+        optimizer = optim.SGD(model.parameters(), lr=lr, momentum=args.momentum)
+        val90 = True
+    
     # /scratch/pm2758/cv_ass2
     if val_acc > best_val_acc:
         best_val_acc = val_acc
-        model_file = 'model_stn.pth'
+        model_file = 'model_stn_lr.pth'
         torch.save(model.state_dict(), model_file)
         print('\nSaved model to ' + model_file + '. You can run `python evaluate.py ' + model_file + '` to generate the Kaggle formatted csv file')
         convergencePlots['best_val_acc'] = [epoch, best_val_acc]
-    pickle.dump( convergencePlots, open( "convergencePlots_model_stn.p", "wb" ) )
+    pickle.dump( convergencePlots, open( "convergencePlots_model_stn_lr.p", "wb" ) )
