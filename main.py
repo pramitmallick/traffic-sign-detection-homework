@@ -47,7 +47,8 @@ val_loader = torch.utils.data.DataLoader(
 from model import Net
 model = Net()
 
-optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+# optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
 
 def train(epoch, convergencePlots):
     model.train()
@@ -104,7 +105,7 @@ for epoch in range(1, args.epochs + 1):
     train(epoch, convergencePlots)
     validation(convergencePlots)
     # model_file = 'model_' + str(epoch) + '.pth'
-    model_file = 'model_latest.pth'
+    model_file = 'model_latest_Adagrad.pth'
     torch.save(model.state_dict(), model_file)
     print('\nSaved model to ' + model_file + '. You can run `python evaluate.py ' + model_file + '` to generate the Kaggle formatted csv file')
-    pickle.dump( convergencePlots, open( "convergencePlots.p", "wb" ) )
+    pickle.dump( convergencePlots, open( "convergencePlots_Adagrad.p", "wb" ) )
