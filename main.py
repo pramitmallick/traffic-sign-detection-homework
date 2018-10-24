@@ -33,18 +33,47 @@ cuda_available = False
 if torch.cuda.is_available():
     cuda_available = True
 
+def make_weights_for_balanced_classes(images, nclasses):                        
+    count = [0] * nclasses                                                      
+    for item in images:                                                         
+        count[item[1]] += 1                                                     
+    weight_per_class = [0.] * nclasses                                      
+    N = float(sum(count))                                                   
+    for i in range(nclasses):                                                   
+        weight_per_class[i] = N/float(count[i])                                 
+    weight = [0] * len(images)                                              
+    for idx, val in enumerate(images):                                          
+        weight[idx] = weight_per_class[val[1]]                                  
+    return weight
+
 ### Data Initialization and Loading
 from data import initialize_data, data_transforms # data.py in the same folder
 initialize_data(args.data) # extracts the zip files, makes a validation set
 
-train_loader = torch.utils.data.DataLoader(
-    datasets.ImageFolder(args.data + '/train_images',
-                         transform=data_transforms),
-    batch_size=args.batch_size, shuffle=True, num_workers=1)
+dataset_train = datasets.ImageFolder(args.data + '/train_images',
+                         transform=data_transforms)                                                                         
+                                                                                
+# For unbalanced dataset we create a weighted sampler                       
+weights = make_weights_for_balanced_classes(dataset_train.imgs, len(dataset_train.classes))                                                                
+weights = torch.DoubleTensor(weights)                                       
+sampler = torch.utils.data.sampler.WeightedRandomSampler(weights, len(weights))                     
+                                                                                
+train_loader = torch.utils.data.DataLoader(dataset_train, batch_size=args.batch_size, shuffle = False,                              
+                                                             sampler = sampler, num_workers=1)
+
 val_loader = torch.utils.data.DataLoader(
     datasets.ImageFolder(args.data + '/val_images',
                          transform=data_transforms),
     batch_size=args.batch_size, shuffle=False, num_workers=1)
+
+# train_loader = torch.utils.data.DataLoader(
+#     datasets.ImageFolder(args.data + '/train_images',
+#                          transform=data_transforms),
+#     batch_size=args.batch_size, shuffle=True, num_workers=1)
+# val_loader = torch.utils.data.DataLoader(
+#     datasets.ImageFolder(args.data + '/val_images',
+#                          transform=data_transforms),
+#     batch_size=args.batch_size, shuffle=False, num_workers=1)
 
 ### Neural Network and Optimizer
 # We define neural net in model.py so that it can be reused by the evaluate.py script
@@ -117,7 +146,7 @@ for epoch in range(1, args.epochs + 1):
     train(epoch, convergencePlots)
     validation(convergencePlots)
     # model_file = 'model_' + str(epoch) + '.pth'
-    model_file = 'model_latest_Adagrad.pth'
+    model_file = 'model_latest_Adagrad_dataAugmentation.pth'
     torch.save(model.state_dict(), model_file)
     print('\nSaved model to ' + model_file + '. You can run `python evaluate.py ' + model_file + '` to generate the Kaggle formatted csv file')
-    pickle.dump( convergencePlots, open( "convergencePlots_Adagrad.p", "wb" ) )
+    pickle.dump( convergencePlots, open( "convergencePlots_Adagrad_dataAugmentation.p", "wb" ) )
