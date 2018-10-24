@@ -13,4 +13,4 @@ module load python/intel/2.7.12 pytorch/0.2.0_1 protobuf/intel/3.1.0 spyder/3.1.
 module load torchvision/0.1.8
 
 python main.py
-python evaluate.py --model model_stn_lr.pth --outfile out_stn_lr.txt
+python evaluate.py --model model_stn_lr2.pth --outfile out_stn_lr2.txt
