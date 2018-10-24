@@ -17,7 +17,7 @@ parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                     help='input batch size for training (default: 64)')
 parser.add_argument('--epochs', type=int, default=100, metavar='N',
                     help='number of epochs to train (default: 1)')
-parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
+parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
                     help='learning rate (default: 0.01)')
 parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
                     help='SGD momentum (default: 0.5)')
@@ -146,7 +146,7 @@ for epoch in range(1, args.epochs + 1):
     train(epoch, convergencePlots)
     validation(convergencePlots)
     # model_file = 'model_' + str(epoch) + '.pth'
-    model_file = 'model_latest_Adagrad_dataAugmentation.pth'
+    model_file = 'model_latest_Adagrad_dataAugmentation_lr.pth'
     torch.save(model.state_dict(), model_file)
     print('\nSaved model to ' + model_file + '. You can run `python evaluate.py ' + model_file + '` to generate the Kaggle formatted csv file')
-    pickle.dump( convergencePlots, open( "convergencePlots_Adagrad_dataAugmentation.p", "wb" ) )
+    pickle.dump( convergencePlots, open( "convergencePlots_Adagrad_dataAugmentation_lr.p", "wb" ) )
