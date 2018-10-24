@@ -52,8 +52,13 @@ def train(epoch):
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
+        # print("data", data.size())
         output = model(data)
-        loss = F.nll_loss(output, target)
+        # print("output", output.size())
+        # print("target", target.size())
+        # break
+        # loss = F.nll_loss(output, target)
+        loss = F.cross_entropy(output, target)
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
