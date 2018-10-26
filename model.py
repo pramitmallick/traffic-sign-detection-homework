@@ -70,7 +70,7 @@ class Net(nn.Module):
         # x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
         # print(x.size())
         x = x.view(-1, 2500)
-        x = F.relu(self.fc1bn(self.fc1(x)))
+        x = F.relu(self.fc1(x))
         x = F.dropout(x, training=self.training)
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
