@@ -147,8 +147,8 @@ lr = args.lr
 optimizer = optim.SGD(model.parameters(), lr=lr, momentum=args.momentum)
 # optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
 val80 = True
-val85 = False
-val90 = True
+val85 = True
+val90 = False
 
 for epoch in range(1, args.epochs + 1):
     [train_loss, train_acc] = train(epoch, convergencePlots, optimizer)
